@@ -76,7 +76,10 @@ class Player(object):
 
         accountInfo = self.replaceElementStackWithValue(self.driver.find_elements(By.CSS_SELECTOR, ".mini-value"))
         self.accountAge = int(accountInfo[0])
-        self.elo = int(accountInfo[4].strip(","))
+        try:
+            self.elo = int(accountInfo[4].strip(","))
+        except ValueError:
+            self.elo = "unranked"
         self.headshotPercent = accountInfo[7]
         self.kdRatio = int(accountInfo[6])
 
