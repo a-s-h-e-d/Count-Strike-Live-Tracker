@@ -3,14 +3,6 @@ from selenium.webdriver.chrome.service import Service
 from selenium.webdriver.common.by import By
 from selenium.webdriver.support.ui import WebDriverWait
 
-#leetify.com
-#for now, don't look too far ahead with the gui; focus on gathering player data
-
-"""
-    @param driver program's Selenium driver
-    @param steamId SteamId of player
-    @param name Player name
-"""
 #driver.find_elements - returns list of elements
 
 class playerMap(object):
@@ -24,6 +16,12 @@ class playerMap(object):
             self.bestSide = "t"
         else:
             self.bestSide = "ct"
+
+"""
+    @param driver program's Selenium driver
+    @param steamId SteamId of player
+    @param name Player name
+"""
 
 class Player(object):
     def __init__(self, driver, steamId, name):
@@ -84,14 +82,25 @@ class Player(object):
 
 
     #compares map win rates to find the highest
-    def getBestMap(self, maps):
-        pass
+    def setBestMap(self, maps):
+        bestmap = None
+        maxGames = 0
+        for map in maps:
+            if maxGames < map.matchesPlayed:
+                maxGames = map.matchesPlayed
+            # second condition prevents "flukes"
+            if map.winrate > bestmap.winrate and map.matchesPlayed > 2:
+                bestmap = map
 
-    #compares t vs ct ratings on best map to find the players best side
-    def getBestMapSide(self, maps):
-        pass
+        if maxGames < 3:
+            for map in maps:
+                if maxGames < map.matchesPlayed:
+                    maxGames = map.matchesPlayed
+                if map.winrate > bestmap.winrate:
+                    bestmap = map
 
-       # self.accountAge = self.driver.find_element(By.CSS_SELECTOR, ".mini-value").text
+        self.bestMap = bestmap
+        self.bestMapSide = bestmap.bestSide
 
     # scraping stats from leetify
     def getLeetifyStats(self):
@@ -105,7 +114,8 @@ class Player(object):
         self.duelScore = scoreStack[3]
         self.clutchScore = scoreStack[4]
 
-        self.rankAimScore = self.replaceElementStackWithValue(self.driver.find_element(By.CSS_SELECTOR, ".benchmark-value.--first.ng-star-inserted"))
+        self.rankAimScore = int(self.driver.find_element(By.CSS_SELECTOR, ".benchmark-value.--first.ng-star-inserted").text)
+
         rankScores = self.replaceElementStackWithValue(self.driver.find_elements(By.CSS_SELECTOR, ".benchmark-value.ng-star-inserted"))
         self.rankUtilitySCore = rankScores[0]
         self.rankPositioningScore = rankScores[1]
@@ -122,6 +132,7 @@ class Player(object):
 
         mapNameStack = self.replaceElementStackWithValue(self.driver.find_elements(By.CSS_SELECTOR, ".name"))
         mapData = scoreStack[5:len(scoreStack)-5]
+
         #deletes leetify rating
         del mapData[1::4]
 

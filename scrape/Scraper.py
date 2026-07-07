@@ -21,13 +21,13 @@ class statScraper(object):
         self.steamIds = steamIds
         #headers for links to scrape
         self.leetify = "https://leetify.com/app/profile/"
-        self.cs2tracker = "ttps://cs2tracker.gg/stats/"
+        self.cs2tracker = "https://cs2tracker.gg/stats/"
 
         # initialize
         self.driver.get("https://leetify.com/app/profile/76561199103680570")
 
         p = Player(self.driver, self.steamIds, "")
-        time.sleep(15)
+        time.sleep(6 )
         p.getLeetifyStats()
         p.printStats()
 
